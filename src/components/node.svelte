@@ -1,6 +1,5 @@
 <script lang="ts">
     export let isOn: boolean = false;
-    console.log("Init node as: " + isOn);
 </script>
 
 <style>
@@ -25,12 +24,14 @@
 <div class="parent">
     {#if isOn == false}
         <div class="isOff">
+            isOff
         </div>
     {/if}
 
 
     {#if isOn == true}
         <div class="isOn">
+            isOn
         </div>
     {/if}
 </div>
