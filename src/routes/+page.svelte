@@ -1,2 +1,24 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script lang="ts">
+    import { AutoGrid } from "../objects/automaton_grid";
+    import Node from "../components/node.svelte";
+
+    const grid = new AutoGrid(50, 50).getGrid();
+</script>
+
+<style>
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(50, 1fr);
+        grid-template-rows: repeat(50, 1fr);
+        gap: 1px;
+    }
+</style>
+
+
+<div class="grid">
+    {#each grid as row}
+        {#each row as node}
+            <Node isOn={node} />
+        {/each}
+    {/each}
+</div>
