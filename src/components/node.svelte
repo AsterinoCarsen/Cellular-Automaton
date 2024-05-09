@@ -4,8 +4,9 @@
 
 <style>
     .parent {
-        width: 20px;
-        height: 20px;
+        width: 35px;
+        height: 35px;
+        border: 2px solid black;
     }
 
     .isOff {
@@ -17,21 +18,19 @@
     .isOn {
         width: 100%;
         height: 100%;
-        background-color: black;
+        background-color: rgba(153, 255, 0, 0.5);
     }
 </style>
 
 <div class="parent">
     {#if isOn == false}
         <div class="isOff">
-            isOff
         </div>
     {/if}
 
 
     {#if isOn == true}
         <div class="isOn">
-            isOn
         </div>
     {/if}
 </div>
