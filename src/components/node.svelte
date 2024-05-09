@@ -6,13 +6,13 @@
     .parent {
         width: 35px;
         height: 35px;
-        border: 2px solid black;
+        border: 2px solid whitesmoke;
     }
 
     .isOff {
         width: 100%;
         height: 100%;
-        background-color: white;
+        background-color: black;
     }
 
     .isOn {

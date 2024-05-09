@@ -5,11 +5,13 @@
 
 import { Vector2 } from "./Vector2";
 
+// A grid representation of a cellular automaton simulation, including time stepping.
 export class AutoGrid {
     private grid: boolean[][];
     private width: number;
     private height: number;
 
+    // Initalize a 2D boolean array where every element is false.
     constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
@@ -27,6 +29,7 @@ export class AutoGrid {
         }
     }
 
+    // Advance the time by one step according to cellular automaton rules.
     timeStep() {
         let needsOn: Vector2[] = [];
         let needsOff: Vector2[] = [];
@@ -57,6 +60,7 @@ export class AutoGrid {
 
     }
 
+    // Count the number of neighbors of a node that are set to true.
     getOnNeighborCount(node: Vector2): number {
         let count: number = 0;
         let neighbors: Vector2[] = this.getNeighbors(node);
@@ -69,6 +73,8 @@ export class AutoGrid {
         return count;
     }
 
+    // Get a list of positions that are neighboring to a specific node.
+    // A neighbor is a position that's one away on X and Y, including diagonals.
     getNeighbors(node: Vector2): Vector2[] {
         let x: number = node.getX();
         let y: number = node.getY();
@@ -95,6 +101,7 @@ export class AutoGrid {
         return finalVectors;
     }
 
+    // Chcek if a given position is within the bounds of the 2D boolean array.
     isWithinBounds(position: Vector2): boolean {
         let x: number = position.getX();
         let y: number = position.getY();
@@ -106,6 +113,7 @@ export class AutoGrid {
         return false;
     }
 
+    // Set all elements of the 2D boolean array to false.
     clear() {
         for (let i = 0; i < this.grid.length; i++) {
             for (let j = 0; j < this.grid[i].length; j++) {
@@ -114,18 +122,22 @@ export class AutoGrid {
         }
     }
 
+    // Change the value of a element at a position.
     setValue(node: Vector2, value: boolean) {
         this.grid[node.getX()][node.getY()] = value;
     }
 
+    // Get the value of a element at a position.
     getValue(node: Vector2) : boolean {
         return this.grid[node.getX()][node.getY()];
     }
 
+    // Get the current 2D boolean array.
     getGrid(): boolean[][] {
         return this.grid;
     }
 
+    // Get a string representation of the 2D boolean array.
     toString(): string {
         let out: string = "";
 
@@ -139,6 +151,7 @@ export class AutoGrid {
         return out;
     }
 
+    // Print into the console the current toString representation.
     print() {
         console.log(this.toString());
     }

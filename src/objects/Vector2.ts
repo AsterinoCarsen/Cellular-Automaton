@@ -1,3 +1,4 @@
+// A position in 2D space.
 export class Vector2 {
     private x: number;
     private y: number;
