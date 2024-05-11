@@ -1,0 +1,94 @@
+.grid {
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+    grid-template-rows: repeat(20, 1fr);
+    width: max-content;
+    gap: 0px;
+}
+
+.parent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    height: 100vh;
+    width: 100vw;
+}
+
+.buttons {
+    border: none;
+    background-color: rgb(32, 32, 32);
+    color: white;
+    width: 200px;
+    height: 50px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.playbacktrue {
+    border: none;
+    background-color: rgb(116, 116, 116);
+    color: white;
+    width: 200px;
+    height: 50px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.playbackfalse {
+    border: none;
+    background-color: rgb(32, 32, 32);
+    color: white;
+    width: 200px;
+    height: 50px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.buttons:hover, .playbacktrue:hover, .playbackfalse:hover {
+    background-color: rgb(53, 53, 53);
+}
+
+.cells {
+    border: none;
+    padding: 0;
+}
+
+.userInput {
+    border: solid 1px rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+    margin: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    justify-self: end;
+}
+
+.slider {
+    -webkit-appearance: none;
+    background-color: rgb(32, 32, 32);
+    width: 200px;
+    height: 50px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    cursor: pointer;
+    background: white;
+    height: 50px;
+}
+
+.slider::-webkit-slider-thumb:hover {
+    background-color: lightgray;
+}
+
+p, button {
+    color: white;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: large;
+}

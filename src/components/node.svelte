@@ -15,10 +15,18 @@
         background-color: black;
     }
 
+    .isOff:hover {
+        background-color: rgb(60, 60, 60);
+    }
+
     .isOn {
         width: 100%;
         height: 100%;
         background-color: rgba(153, 255, 0, 0.5);
+    }
+
+    .isOn:hover {
+        background-color: #d1ff8d80;
     }
 </style>
 
