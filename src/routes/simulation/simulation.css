@@ -1,3 +1,8 @@
+::selection {
+    background-color: white;
+    color: black;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(20, 1fr);

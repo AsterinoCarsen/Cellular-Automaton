@@ -1,79 +1,27 @@
 <script lang="ts">
-    import { AutoGrid } from "../objects/automaton_grid";
-    import { Vector2 } from "../objects/Vector2";
-    import Node from "../components/node.svelte";
     import Navbar from "../components/navbar.svelte";
-    import "../lib/homePage.css";
-
-    let grid = new AutoGrid(20, 20);
-    let internalGrid: boolean[][] = grid.getGrid();
-
-    let isPlaying: boolean = false;
-    let intervalId: number | undefined;
-
-    let inputSimulationSpeed = 0.5;
-
-    function timeStep() {
-        grid.timeStep();
-        updateInternalGrid();
-    }
-
-    function togglePlayback() {
-        isPlaying = !isPlaying;
-        if (isPlaying) {
-            // Call timeStep() every x seconds
-            intervalId = setInterval(timeStep, inputSimulationSpeed * 1000);
-        } else {
-            clearInterval(intervalId);
-        }
-    }
-
-    function updateSimulationSpeed() {
-        if (isPlaying) {
-            clearInterval(intervalId);
-            intervalId = setInterval(timeStep, inputSimulationSpeed * 1000);
-        }
-    }
-
-    function clear() {
-        grid.clear();
-        updateInternalGrid();
-    }
-
-    function toggleNode(x: number, y: number) {
-        let vector: Vector2 = new Vector2(x, y);
-        grid.setValue(vector, !grid.getValue(vector));
-        updateInternalGrid();
-    }
-
-    function updateInternalGrid() {
-        internalGrid = grid.getGrid();
-    }
+    import "./home.css";
 </script>
 
 <Navbar />
-
 <div class="parent">
-    <div class="grid">
-        {#each internalGrid as row, i}
-            {#each row as node, j}
-                <button class="cells" on:click={() => toggleNode(i, j)}>
-                    <Node bind:isOn={internalGrid[i][j]} />
-                </button>
-            {/each}
-        {/each}
-    </div>
-
-    <div class="userInput">
-        <button class="playback{isPlaying}" on:click={togglePlayback}>Toggle Playback</button>
-        <button class="buttons" on:click={clear}>Reset</button>
-        <input class="slider" type="range" min="0.05" max="1" step="0.01" bind:value={inputSimulationSpeed} on:change={updateSimulationSpeed} >
+    <div class="text-content">
+        <h1>About</h1>
         <p>
-            {#if inputSimulationSpeed == 1}
-                {inputSimulationSpeed} second / update
-            {:else}
-                {inputSimulationSpeed} seconds / update
-            {/if}
+            This web application simulates Conway's Game of Life, which is a discrete simulation of cells, arranged in a grid, that evolve over time, according to a small set of rules.
+            <br><br>
+            Conway's Game of Life was created by John Horton Conway in 1970, a British mathematician.  It is a specific type of Cellular Automaton simulation, which is a broader concept in computational study known as automata theory.  The concept anthropomorphizes the individual cells as living beings that live due to reproduction or die due to overpopulation.
+            <br><br>
+            The simulation starts with some initial conditions, which is a certain set of cells that are alive.  Once the simulation begins, each time step calculates which cells die from overpopulation or underpopulation, which are born from reproduction, and which cells stay alive into the next time-step.
+            <br><br>
+            The rules are as follows:
         </p>
+
+        <ul>
+            <li>Any alive cell with fewer than two alive neighbors dies by underpopulation.</li>
+            <li>Any alive cell with two or three alive neighbors stays alive.</li>
+            <li>Any alive cell with more than three alive neighbors dies by overpopulation.</li>
+            <li>And dead cell with exactly three neighbors becomes alive due to reproduction.</li>
+        </ul>
     </div>
 </div>
