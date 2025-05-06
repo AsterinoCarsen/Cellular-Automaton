@@ -1,32 +1,31 @@
 import { useEffect, useRef } from 'react';
 
 interface GridProps {
-    size: number;
     cellSize: number;
     cells: boolean[][];
 }
 
-export default function Grid({ size, cellSize, cells }: GridProps) {
+export default function Grid({ cellSize, cells }: GridProps) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const dimension = size * cellSize;
+
+    const numRows = cells.length;
+    const numCols = cells[0]?.length ?? 0;
+
+    if (numRows === 0 || numCols === 0) {
+        throw new Error("[Grid] Input array must not be empty.");
+    }
+
+    if (numRows !== numCols) {
+        throw new Error("[Grid] Input array must be square.");
+    }
+
+    if (cellSize < 10) {
+        throw new Error("[Grid] Parameter 'cellSize' is too small.");
+    }
+
+    const dimension = numRows * cellSize;
 
     useEffect(() => {
-        if (cells.length != cells[0].length) {
-            throw new Error("[Grid] Input cells are not square.");
-        }
-
-        if (cells.length != size) {
-            throw new Error("[Grid] Parameter 'size' needs to match the dimension of input cells array.");
-        }
-
-        if (size < 1) {
-            throw new Error("[Grid] Parameter 'size' is not large enough.");
-        }
-
-        if (cellSize < 10) {
-            throw new Error("[Grid] Parameter 'cellSize' is not large enough.");
-        }
-
         const canvas = canvasRef.current;
         if (!canvas) {
             throw new Error("[Grid] Cannot find Canvas reference.")
@@ -54,16 +53,21 @@ export default function Grid({ size, cellSize, cells }: GridProps) {
         }  
 
         const offset = 1;
-        for (let row = 0; row < size; row++) {
-            for (let col = 0; col < size; col++) {
+        for (let row = 0; row < numRows; row++) {
+            for (let col = 0; col < numRows; col++) {
                 if (cells[row]?.[col]) {
                     ctx.fillStyle = '#fff';
-                    ctx.fillRect(col * cellSize + offset, row * cellSize + offset, cellSize - offset * 2, cellSize - offset * 2);
+                    ctx.fillRect(
+                        col * cellSize + offset,
+                        row * cellSize + offset,
+                        cellSize - offset * 2,
+                        cellSize - offset * 2
+                    );
                 }
             }
         }      
 
-    }, [size, cellSize, dimension, cells]);
+    }, [numRows, cellSize, dimension, cells]);
 
     return (
         <canvas ref={canvasRef} width={dimension} height={dimension} />
