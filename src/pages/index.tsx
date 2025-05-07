@@ -1,61 +1,64 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { GridEvolutionFactory } from '@/lib/factories/GridEvolutionFactory';
+
+import { OverpopulationStrategy } from '@/lib/stratRules/OverpopulationStrategy';
+import { UnderpopulationStrategy } from '@/lib/stratRules/UnderpopulationStrategy';
+import { ReproductionStrategy } from '@/lib/stratRules/ReproductionStrategy';
+import { SurvivalStrategy } from '@/lib/stratRules/SurvivalStrategy';
+
 import Grid from "../comps/Grid";
-import Line from "../comps/Line";
 
 export default function Home() {
-    const [cellsGrid, setCellsGrid] = useState<boolean[][]>([
-        [true, false, false, false, false],
-        [false, true, false, false, false],
-        [false, false, false, true, false],
-        [false, false, false, true, false],
-        [false, true, false, false, false]
-    ]);
-    
-    const [cellsLine, setCellsLine] = useState<boolean[]>([
-        true, false, false, false, true, true, false, false
-    ]);
+    const evolutionRef = useRef(
+        GridEvolutionFactory.create(
+            5,
+            [new UnderpopulationStrategy(), new SurvivalStrategy(), new OverpopulationStrategy(), new ReproductionStrategy()],
+            true
+        )
+    );
 
-    function handleGridClick() {
-        const size = cellsGrid.length;
-        const row = Math.floor(Math.random() * size);
-        const col = Math.floor(Math.random() * size);
+    const [cellsGrid, setCellsGrid] = useState<boolean[][]>(
+        evolutionRef.current.getState()  
+    );
 
-        const newGrid = cellsGrid.map(row => [...row]);
+    const [isRunning, setIsRunning] = useState<boolean>(false);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-        newGrid[row][col] = !newGrid[row][col];
-
-        setCellsGrid(newGrid);
+    const handleTick = () => {
+        evolutionRef.current.tick();
+        const newState = evolutionRef.current.getState().map(row => [...row]);
+        setCellsGrid(newState);
     }
 
-    function handleLineClick() {
-        const size = cellsLine.length;
-        const index = Math.floor(Math.random() * size);
-
-        const newLine = [...cellsLine];
-
-        newLine[index] = !newLine[index];
-
-        setCellsLine(newLine);
+    const toggleIsRunning = () => {
+        if (isRunning) {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+            setIsRunning(false);
+        } else {
+            intervalRef.current = setInterval(() => {
+                handleTick();
+            }, 150);
+            setIsRunning(true);
+        }
     }
 
     return (
         <div className="flex flex-col gap-4 justify-center items-center w-screen h-screen">
-            <Grid cells={cellsGrid} cellSize={50} />
-            <Line cells={cellsLine} cellSize={50} />
+            <Grid cells={cellsGrid} cellSize={40} />
 
             <button
-                onClick={handleGridClick}
-                className="px-6 py-2 bg-blue-400 text-white rounded-xl shadow-md hover:bg-blue-500 transition-all"
+                onClick={toggleIsRunning}
+                className={`px-6 py-2 rounded-xl shadow-md transition-all text-white ${
+                    isRunning ? "bg-green-500 hover:bg-green-600" : "bg-blue-400 hover:bg-blue-500"
+                }`}
+                
             >
-                Change Grid State
+                Toggle Runtime
             </button>
 
-            <button
-                onClick={handleLineClick}
-                className="px-6 py-2 bg-green-400 text-white rounded-xl shadow-md hover:bg-green-500 transition-all"
-            >
-                Change Line State
-            </button>
         </div>
     );
 }

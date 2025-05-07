@@ -67,7 +67,7 @@ export default function Grid({ cellSize, cells }: GridProps) {
             }
         }      
 
-    }, [numRows, cellSize, dimension, cells]);
+    }, [cells, cellSize, dimension, numRows]);
 
     return (
         <canvas ref={canvasRef} width={dimension} height={dimension} />
