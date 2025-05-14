@@ -1,7 +1,9 @@
-import { EvolutionStrategy } from "./EvolutionStrategy";
+import { EvolutionStrategy, StrategyType } from "./EvolutionStrategy";
 
 // Any live cell with fewer than two live neighbors dies.
 export class UnderpopulationStrategy implements EvolutionStrategy {
+    readonly type = StrategyType.Death;
+
     apply(x: number, y: number, state: boolean[][]): boolean {
         const rows = state.length;
         const cols = state[0].length;

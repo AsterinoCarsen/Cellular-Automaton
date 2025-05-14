@@ -3,9 +3,10 @@ import { useEffect, useRef } from 'react';
 interface GridProps {
     cellSize: number;
     cells: boolean[][];
+    onToggleCells: (row: number, col: number) => void;
 }
 
-export default function Grid({ cellSize, cells }: GridProps) {
+export default function Grid({ cellSize, cells, onToggleCells }: GridProps) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     const numRows = cells.length;
@@ -65,11 +66,31 @@ export default function Grid({ cellSize, cells }: GridProps) {
                     );
                 }
             }
-        }      
+        }
+        
+        const handleClick = (e: MouseEvent) => {
+            if (!canvas) return;
 
-    }, [cells, cellSize, dimension, numRows]);
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const col = Math.floor(x / cellSize);
+            const row = Math.floor(y / cellSize);
+
+            if (row >= 0 && row < numRows && col >= 0 && col < numCols) {
+                onToggleCells(row, col);
+            }
+        };
+
+        canvas.addEventListener('click', handleClick);
+        return () => {
+            canvas.removeEventListener('click', handleClick);
+        }
+
+    }, [cells, cellSize, dimension, numRows, numCols, onToggleCells]);
 
     return (
-        <canvas ref={canvasRef} width={dimension} height={dimension} />
+        <canvas ref={canvasRef} width={dimension} height={dimension} style={{ cursor: 'pointer' }} />
     )
 }

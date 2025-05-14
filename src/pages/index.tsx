@@ -11,7 +11,7 @@ import Grid from "../comps/Grid";
 export default function Home() {
     const evolutionRef = useRef(
         GridEvolutionFactory.create(
-            5,
+            10,
             [new UnderpopulationStrategy(), new SurvivalStrategy(), new OverpopulationStrategy(), new ReproductionStrategy()],
             true
         )
@@ -45,9 +45,24 @@ export default function Home() {
         }
     }
 
+    const handleToggleCell = (row: number, col: number) => {
+        const newGrid = cellsGrid.map((rowArr, i) => 
+            rowArr.map((cell, j) => (i === row && j === col ? !cell : cell))
+        );
+
+        evolutionRef.current = GridEvolutionFactory.create(
+            newGrid.length,
+            [new UnderpopulationStrategy(), new SurvivalStrategy(), new OverpopulationStrategy(), new ReproductionStrategy()],
+            false,
+            newGrid
+        );
+
+        setCellsGrid(newGrid);
+    }
+
     return (
         <div className="flex flex-col gap-4 justify-center items-center w-screen h-screen">
-            <Grid cells={cellsGrid} cellSize={40} />
+            <Grid cells={cellsGrid} cellSize={40} onToggleCells={handleToggleCell} />
 
             <button
                 onClick={toggleIsRunning}
@@ -56,7 +71,7 @@ export default function Home() {
                 }`}
                 
             >
-                Toggle Runtime
+                {isRunning ? "ON" : "OFF"}
             </button>
 
         </div>

@@ -5,8 +5,13 @@ export class GridEvolutionFactory {
     public static create(
         size: number,
         strategies: EvolutionStrategy[],
-        randomize: boolean = false
+        randomize: boolean = false,
+        customInitialState?: boolean[][]
     ): GridEvolution {
+        if (customInitialState) {
+            return new GridEvolution(customInitialState, strategies);
+        }
+
         const initialState: boolean[][] = [];
 
         for (let i = 0; i < size; i++) {

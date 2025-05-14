@@ -1,40 +1,49 @@
-import { EvolutionStrategy } from "../stratRules/EvolutionStrategy";
+import { EvolutionStrategy, StrategyType } from "../stratRules/EvolutionStrategy";
 
 export class GridEvolution {
     private state: boolean[][];
     private strategies: EvolutionStrategy[];
 
     constructor(initialState: boolean[][], strategies: EvolutionStrategy[]) {
-        this.state = initialState;
+        this.state = initialState.map(r => [...r]);
         this.strategies = strategies;
     }
 
     public tick(): void {
-        let workingState = this.state.map(row => [...row]);
-    
-        for (const strat of this.strategies) {
-            const updatedState: boolean[][] = [];
-    
-            for (let i = 0; i < workingState.length; i++) {
-                const newRow: boolean[] = [];
-    
-                for (let j = 0; j < workingState[0].length; j++) {
-                    const newCellState = strat.apply(i, j, workingState);
-                    newRow.push(newCellState);
+        const oldState = this.state;
+        const N = oldState.length;
+        const next: boolean[][] = [];
+
+        const deathRules = this.strategies.filter(s => s.type === StrategyType.Death);
+        const lifeRules = this.strategies.filter(s => s.type === StrategyType.Life);
+
+        for (let x = 0; x < N; x++) {
+            const newRow: boolean[] = [];
+            
+            for (let y = 0; y < N; y++) {
+                const isAlive = oldState[x][y];
+
+                if (isAlive) {
+                    const dies = deathRules.some(strat => strat.apply(x, y, oldState) === false);
+                    if (dies) {
+                        newRow.push(false);
+                        continue;
+                    }
                 }
-    
-                updatedState.push(newRow);
+
+                const lives = lifeRules.some(strat => strat.apply(x, y, oldState));
+                newRow.push(lives);
             }
-    
-            workingState = updatedState;
+
+            next.push(newRow);
         }
-    
-        this.state = workingState;
+
+        this.state = next;
     }
     
 
     public getState(): boolean[][] {
-        return this.state;
+        return this.state.map(r => [...r]);
     }
 
 }
