@@ -1,8 +1,10 @@
 import { EvolutionStrategy, StrategyType } from "./EvolutionStrategy";
+import { v4 as uuidv4 } from 'uuid';
 
 // Any live cell with more than three live neighbors dies.
 export class OverpopulationStrategy implements EvolutionStrategy {
     readonly type = StrategyType.Death;
+    readonly id = uuidv4();
 
     apply(x: number, y: number, state: boolean[][]): boolean {
         const rows = state.length;

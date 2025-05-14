@@ -1,8 +1,10 @@
 import { EvolutionStrategy, StrategyType } from "./EvolutionStrategy";
+import { v4 as uuidv4 } from 'uuid'; 
 
 // Any live cell with two or three live neighbors lives on to the next generation.
 export class SurvivalStrategy implements EvolutionStrategy {
     readonly type = StrategyType.Life;
+    readonly id = uuidv4();
 
     apply(x: number, y: number, state: boolean[][]): boolean {
         const rows = state.length;

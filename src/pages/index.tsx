@@ -1,5 +1,8 @@
 import { useState, useRef } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { GridEvolutionFactory } from '@/lib/factories/GridEvolutionFactory';
+
+import { EvolutionStrategy } from '@/lib/stratRules/EvolutionStrategy';
 
 import { OverpopulationStrategy } from '@/lib/stratRules/OverpopulationStrategy';
 import { UnderpopulationStrategy } from '@/lib/stratRules/UnderpopulationStrategy';
@@ -8,13 +11,32 @@ import { SurvivalStrategy } from '@/lib/stratRules/SurvivalStrategy';
 
 import Grid from "../comps/Grid";
 
+import { Toggle } from '@/components/ui/toggle';
+
+import {
+    DndContext,
+    closestCenter,
+    DragEndEvent
+} from '@dnd-kit/core';
+
+import {
+    arrayMove,
+    SortableContext,
+    verticalListSortingStrategy
+} from '@dnd-kit/sortable';
+
+import { SortableStrategyItem } from '@/comps/SortableStrategyItem';
+
 export default function Home() {
+    const [strategies, setStrategies] = useState([
+        new UnderpopulationStrategy(),
+        new SurvivalStrategy(),
+        new OverpopulationStrategy(),
+        new ReproductionStrategy()
+    ]);
+
     const evolutionRef = useRef(
-        GridEvolutionFactory.create(
-            10,
-            [new UnderpopulationStrategy(), new SurvivalStrategy(), new OverpopulationStrategy(), new ReproductionStrategy()],
-            true
-        )
+        GridEvolutionFactory.create(20, strategies, true)
     );
 
     const [cellsGrid, setCellsGrid] = useState<boolean[][]>(
@@ -60,19 +82,58 @@ export default function Home() {
         setCellsGrid(newGrid);
     }
 
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (active.id !== over?.id) {
+            const oldIndex = strategies.findIndex(s => s.id === active.id);
+            const newIndex = strategies.findIndex(s => s.id === over?.id);
+            const newOrder = arrayMove(strategies, oldIndex, newIndex);
+            setStrategies(newOrder);
+
+            evolutionRef.current = GridEvolutionFactory.create(
+                cellsGrid.length,
+                newOrder,
+                false,
+                cellsGrid
+            );
+        }
+    };
+
+    const handleDeleteStrategy = (id: string) => {
+        const updated = strategies.filter((s) => s.id !== id);
+        setStrategies(updated);
+        
+        evolutionRef.current = GridEvolutionFactory.create(
+            cellsGrid.length,
+            updated,
+            false,
+            cellsGrid
+        );
+    }
+
     return (
-        <div className="flex flex-col gap-4 justify-center items-center w-screen h-screen">
+        <div className="flex flex-row gap-4 justify-center items-center w-screen h-screen">
             <Grid cells={cellsGrid} cellSize={40} onToggleCells={handleToggleCell} />
 
-            <button
-                onClick={toggleIsRunning}
-                className={`px-6 py-2 rounded-xl shadow-md transition-all text-white ${
-                    isRunning ? "bg-green-500 hover:bg-green-600" : "bg-blue-400 hover:bg-blue-500"
-                }`}
-                
-            >
-                {isRunning ? "ON" : "OFF"}
-            </button>
+            <div className='flex flex-col w-96 h-96 border-1 rounded-lg p-8'>
+                <Toggle
+                    onClick={toggleIsRunning}
+                    variant="outline"
+                >
+                    {isRunning ? "Turn Off" : "Turn On"}
+                </Toggle>
+
+                <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext items={strategies.map(s => s.id)} strategy={verticalListSortingStrategy}>
+                        <div className='flex flex-col gap-2 mt-4 overflow-auto max-h-72'>
+                            {strategies.map(strategy => (
+                                <SortableStrategyItem key={strategy.id} strategy={strategy} onDelete={handleDeleteStrategy} />
+                            ))}
+                        </div>
+                    </SortableContext>
+                </DndContext>
+
+            </div>
 
         </div>
     );

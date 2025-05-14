@@ -5,5 +5,6 @@ export enum StrategyType {
 
 export interface EvolutionStrategy {
     readonly type: StrategyType;
+    readonly id: string;
     apply(x: number, y: number, state: boolean[][] | boolean[]): boolean;
 }

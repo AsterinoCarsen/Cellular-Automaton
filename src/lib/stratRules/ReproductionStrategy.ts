@@ -1,8 +1,10 @@
 import { EvolutionStrategy, StrategyType } from "./EvolutionStrategy";
+import { v4 as uuidv4 } from 'uuid';
 
 // Any dead cell with exactly three live neighbors becomes a live cell, by reproduction.
 export class ReproductionStrategy implements EvolutionStrategy {
     readonly type = StrategyType.Life;
+    readonly id = uuidv4();
     
     apply(x: number, y: number, state: boolean[][]): boolean {
         if (state[x][y] === true) return true;
