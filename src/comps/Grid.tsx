@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface GridProps {
     cellSize: number;
@@ -8,6 +8,7 @@ interface GridProps {
 
 export default function Grid({ cellSize, cells, onToggleCells }: GridProps) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const [hoveredCell, setHoveredCell] = useState<[number, number] | null>(null);
 
     const numRows = cells.length;
     const numCols = cells[0]?.length ?? 0;
@@ -67,6 +68,40 @@ export default function Grid({ cellSize, cells, onToggleCells }: GridProps) {
                 }
             }
         }
+
+        if (hoveredCell) {
+            const [row, col] = hoveredCell;
+
+            if (cells[row][col]) {
+                ctx.fillStyle = 'rgb(245, 245, 245)';
+            } else {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            }
+
+            ctx.fillRect(
+                col * cellSize + offset,
+                row * cellSize + offset,
+                cellSize - offset * 2,
+                cellSize - offset * 2
+            );
+        }
+
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!canvas) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const col = Math.floor(x / cellSize);
+            const row = Math.floor(y / cellSize);
+
+            if (row >= 0 && row < numRows && col >= 0 && col < numCols) {
+                setHoveredCell([row, col]);
+            } else {
+                setHoveredCell(null);
+            }
+        }
         
         const handleClick = (e: MouseEvent) => {
             if (!canvas) return;
@@ -84,11 +119,14 @@ export default function Grid({ cellSize, cells, onToggleCells }: GridProps) {
         };
 
         canvas.addEventListener('click', handleClick);
+        canvas.addEventListener('mousemove', handleMouseMove);
+
         return () => {
             canvas.removeEventListener('click', handleClick);
+            canvas.removeEventListener('mousemove', handleMouseMove);
         }
 
-    }, [cells, cellSize, dimension, numRows, numCols, onToggleCells]);
+    }, [cells, cellSize, dimension, numRows, numCols, onToggleCells, hoveredCell]);
 
     return (
         <canvas ref={canvasRef} width={dimension} height={dimension} style={{ cursor: 'pointer' }} />

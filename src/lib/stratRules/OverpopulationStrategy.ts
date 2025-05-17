@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 export class OverpopulationStrategy implements EvolutionStrategy {
     readonly type = StrategyType.Death;
     readonly id = uuidv4();
+    readonly title = "Overpopulation";
+    readonly description = "Any live cell with more than three neighbors dies.";
 
     apply(x: number, y: number, state: boolean[][]): boolean {
         const rows = state.length;

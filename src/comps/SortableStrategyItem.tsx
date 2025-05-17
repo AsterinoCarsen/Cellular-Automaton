@@ -18,21 +18,21 @@ export function SortableStrategyItem({ strategy, onDelete }: { strategy: Evoluti
         <div
             ref={setNodeRef}
             style={style}
-            className="flex items-center justify-between gap-2 p-2 border border-white/20 rounded-md bg-white/5"
+            className="flex items-center justify-between gap-2 p-2 border border-white/20 rounded-md bg-white/5 h-16"
             >
             <div className="flex items-center gap-2">
                 <button {...attributes} {...listeners}>
                 <GripVertical className="text-white opacity-60 cursor-grab" />
                 </button>
                 <div className="flex flex-col">
-                <span className="font-semibold text-white">{strategy.constructor.name}</span>
-                <span className="text-xs text-white/50">{strategy.type}</span>
+                <span className="font-semibold text-white">{strategy.title}</span>
+                <span className="text-xs text-white/50">{strategy.description}</span>
                 </div>
             </div>
 
-            <button onClick={() => onDelete(strategy.id)} title="Delete Strategy">
+            <Button variant="outline" onClick={() => onDelete(strategy.id)} title="Delete Strategy">
                 <Trash2 className="text-red-400 hover:text-red-500" size={18} />
-            </button>
+            </Button>
         </div>
     );
 }

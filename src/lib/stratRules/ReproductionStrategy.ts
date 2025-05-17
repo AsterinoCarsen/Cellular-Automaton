@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 export class ReproductionStrategy implements EvolutionStrategy {
     readonly type = StrategyType.Life;
     readonly id = uuidv4();
+    readonly title = "Reproduction";
+    readonly description = "Any dead cell with three live neighbors becomes a live cell, by reproduction.";
     
     apply(x: number, y: number, state: boolean[][]): boolean {
         if (state[x][y] === true) return true;

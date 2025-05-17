@@ -3,6 +3,24 @@
 
 @custom-variant dark (&:is(.dark *));
 
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    border: 2px solid #000;
+}
+
+::-webkit-scrollbar-corner {
+    background: #000;
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

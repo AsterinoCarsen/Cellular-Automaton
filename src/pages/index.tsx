@@ -1,8 +1,5 @@
-import { useState, useRef } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { useState, useRef, useEffect } from 'react';
 import { GridEvolutionFactory } from '@/lib/factories/GridEvolutionFactory';
-
-import { EvolutionStrategy } from '@/lib/stratRules/EvolutionStrategy';
 
 import { OverpopulationStrategy } from '@/lib/stratRules/OverpopulationStrategy';
 import { UnderpopulationStrategy } from '@/lib/stratRules/UnderpopulationStrategy';
@@ -12,6 +9,9 @@ import { SurvivalStrategy } from '@/lib/stratRules/SurvivalStrategy';
 import Grid from "../comps/Grid";
 
 import { Toggle } from '@/components/ui/toggle';
+import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 
 import {
     DndContext,
@@ -44,6 +44,7 @@ export default function Home() {
     );
 
     const [isRunning, setIsRunning] = useState<boolean>(false);
+    const [speed, setSpeed] = useState<number>(1);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const handleTick = () => {
@@ -51,6 +52,23 @@ export default function Home() {
         const newState = evolutionRef.current.getState().map(row => [...row]);
         setCellsGrid(newState);
     }
+
+    useEffect(() => {
+        if (isRunning) {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+            intervalRef.current = setInterval(() => {
+                handleTick();
+            }, (150 / speed));
+        }
+
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        }
+    }, [speed, isRunning]);
 
     const toggleIsRunning = () => {
         if (isRunning) {
@@ -62,7 +80,7 @@ export default function Home() {
         } else {
             intervalRef.current = setInterval(() => {
                 handleTick();
-            }, 150);
+            }, (150 / speed));
             setIsRunning(true);
         }
     }
@@ -115,23 +133,52 @@ export default function Home() {
         <div className="flex flex-row gap-4 justify-center items-center w-screen h-screen">
             <Grid cells={cellsGrid} cellSize={40} onToggleCells={handleToggleCell} />
 
-            <div className='flex flex-col w-96 h-96 border-1 rounded-lg p-8'>
-                <Toggle
-                    onClick={toggleIsRunning}
-                    variant="outline"
-                >
-                    {isRunning ? "Turn Off" : "Turn On"}
-                </Toggle>
-
+            <div className='flex flex-col w-128 h-150 border-1 rounded-lg p-8'>
+                <h1 className='font-semibold text-white'>Controls</h1>
+                <p className='my-1 text-sm text-white/50'>Change the simulation rules, order of operations and</p>
+                <Separator className='bg-white/20 h-px my-2' />
                 <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                     <SortableContext items={strategies.map(s => s.id)} strategy={verticalListSortingStrategy}>
-                        <div className='flex flex-col gap-2 mt-4 overflow-auto max-h-72'>
+                        <div className='flex flex-col gap-2 mt-4 overflow-auto h-auto scrollbar-thumb-white/30'>
                             {strategies.map(strategy => (
                                 <SortableStrategyItem key={strategy.id} strategy={strategy} onDelete={handleDeleteStrategy} />
                             ))}
                         </div>
                     </SortableContext>
                 </DndContext>
+
+                <Slider 
+                    onValueChange={(value) => setSpeed(value[0])} 
+                    className='my-4 w-full' 
+                    defaultValue={[1]} 
+                    max={1.75} min={0.25} step={0.25}
+                    
+                />
+                
+                <p className='text-sm text-white text-center -mt-2'>
+                    <b>Simulation Speed: </b>{speed.toFixed(2)}x
+                </p>
+
+                <Button className='my-4' variant="outline"
+                    onClick={() => {
+                        evolutionRef.current = GridEvolutionFactory.create(
+                            cellsGrid.length,
+                            strategies,
+                            true
+                        );
+                        setCellsGrid(evolutionRef.current.getState());
+                    }}
+                >
+                    Randomize Grid
+                </Button>
+
+                <Toggle
+                    onClick={toggleIsRunning}
+                    variant="outline"
+                    className='my-4'
+                >
+                    {isRunning ? "Turn Off" : "Turn On"}
+                </Toggle>
 
             </div>
 

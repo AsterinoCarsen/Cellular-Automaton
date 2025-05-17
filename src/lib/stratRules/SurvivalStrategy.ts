@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 export class SurvivalStrategy implements EvolutionStrategy {
     readonly type = StrategyType.Life;
     readonly id = uuidv4();
+    readonly title = "Survival";
+    readonly description = "Any live cell with two or three live neighbors lives on to the next generation.";
 
     apply(x: number, y: number, state: boolean[][]): boolean {
         const rows = state.length;
