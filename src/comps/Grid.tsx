@@ -118,12 +118,18 @@ export default function Grid({ cellSize, cells, onToggleCells }: GridProps) {
             }
         };
 
+        const handleMouseLeave = () => {
+            setHoveredCell(null);
+        }
+
         canvas.addEventListener('click', handleClick);
         canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseleave', handleMouseLeave);
 
         return () => {
             canvas.removeEventListener('click', handleClick);
             canvas.removeEventListener('mousemove', handleMouseMove);
+            canvas.removeEventListener('mouseleave', handleMouseLeave);
         }
 
     }, [cells, cellSize, dimension, numRows, numCols, onToggleCells, hoveredCell]);

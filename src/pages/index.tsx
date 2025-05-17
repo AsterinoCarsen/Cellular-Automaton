@@ -12,6 +12,12 @@ import { Toggle } from '@/components/ui/toggle';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem
+} from "@/components/ui/dropdown-menu";
 
 import {
     DndContext,
@@ -26,9 +32,10 @@ import {
 } from '@dnd-kit/sortable';
 
 import { SortableStrategyItem } from '@/comps/SortableStrategyItem';
+import { EvolutionStrategy } from '@/lib/stratRules/EvolutionStrategy';
 
 export default function Home() {
-    const [strategies, setStrategies] = useState([
+    const [strategies, setStrategies] = useState<EvolutionStrategy[]>([
         new UnderpopulationStrategy(),
         new SurvivalStrategy(),
         new OverpopulationStrategy(),
@@ -46,6 +53,13 @@ export default function Home() {
     const [isRunning, setIsRunning] = useState<boolean>(false);
     const [speed, setSpeed] = useState<number>(1);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    const allAvailableStrategies = [
+        new UnderpopulationStrategy(),
+        new SurvivalStrategy(),
+        new OverpopulationStrategy(),
+        new ReproductionStrategy()
+    ];
 
     const handleTick = () => {
         evolutionRef.current.tick();
@@ -129,14 +143,63 @@ export default function Home() {
         );
     }
 
+    const handleAddStrategy = (strategyClassName: string) => {
+        const StrategyMap: Record<string, () => EvolutionStrategy> = {
+            UnderpopulationStrategy: () => new UnderpopulationStrategy(),
+            SurvivalStrategy: () => new SurvivalStrategy(),
+            OverpopulationStrategy: () => new OverpopulationStrategy(),
+            ReproductionStrategy: () => new ReproductionStrategy()
+        };
+
+        const newStrategy = StrategyMap[strategyClassName]();
+        const updatedStrategies = [...strategies, newStrategy];
+        setStrategies(updatedStrategies);
+
+        evolutionRef.current = GridEvolutionFactory.create(
+            cellsGrid.length,
+            updatedStrategies,
+            false,
+            cellsGrid
+        );
+    };
+
     return (
         <div className="flex flex-row gap-4 justify-center items-center w-screen h-screen">
             <Grid cells={cellsGrid} cellSize={40} onToggleCells={handleToggleCell} />
 
-            <div className='flex flex-col w-128 h-150 border-1 rounded-lg p-8'>
-                <h1 className='font-semibold text-white'>Controls</h1>
-                <p className='my-1 text-sm text-white/50'>Change the simulation rules, order of operations and</p>
+            <div className='flex flex-col w-128 h-160 border-1 rounded-lg p-8 select-none'>
+                <div className='flex'>
+                    <div className='flex flex-col w-2/3'>
+                        <h1 className='font-semibold text-white'>Controls</h1>
+                        <p className='my-1 text-sm text-white/50'>Change the settings of the simulation.</p>
+                    </div>
+
+                    <div className='flex w-1/3 justify-end items-end'>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline">
+                                    +
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className='bg-black text-white'>
+                                {allAvailableStrategies
+                                    .filter(s => !strategies.some(existing => existing.constructor.name === s.constructor.name))
+                                    .map(strategy => (
+                                        <DropdownMenuItem
+                                            key={strategy.id}
+                                            onClick={() => handleAddStrategy(strategy.constructor.name)}
+                                        >
+                                            {strategy.title}
+                                        </DropdownMenuItem>
+                                    ))
+                                }
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </div>
+
                 <Separator className='bg-white/20 h-px my-2' />
+
                 <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                     <SortableContext items={strategies.map(s => s.id)} strategy={verticalListSortingStrategy}>
                         <div className='flex flex-col gap-2 mt-4 overflow-auto h-auto scrollbar-thumb-white/30'>
