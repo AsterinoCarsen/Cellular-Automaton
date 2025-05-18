@@ -31,6 +31,8 @@ import {
     verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 
+import { Plus } from 'lucide-react';
+
 import { SortableStrategyItem } from '@/comps/SortableStrategyItem';
 import { EvolutionStrategy } from '@/lib/stratRules/EvolutionStrategy';
 
@@ -143,15 +145,15 @@ export default function Home() {
         );
     }
 
-    const handleAddStrategy = (strategyClassName: string) => {
+    const handleAddStrategy = (strategyTitle: string) => {
         const StrategyMap: Record<string, () => EvolutionStrategy> = {
-            UnderpopulationStrategy: () => new UnderpopulationStrategy(),
-            SurvivalStrategy: () => new SurvivalStrategy(),
-            OverpopulationStrategy: () => new OverpopulationStrategy(),
-            ReproductionStrategy: () => new ReproductionStrategy()
+            "Underpopulation": () => new UnderpopulationStrategy(),
+            "Survival": () => new SurvivalStrategy(),
+            "Overpopulation": () => new OverpopulationStrategy(),
+            "Reproduction": () => new ReproductionStrategy()
         };
 
-        const newStrategy = StrategyMap[strategyClassName]();
+        const newStrategy = StrategyMap[strategyTitle]();
         const updatedStrategies = [...strategies, newStrategy];
         setStrategies(updatedStrategies);
 
@@ -171,14 +173,14 @@ export default function Home() {
                 <div className='flex'>
                     <div className='flex flex-col w-2/3'>
                         <h1 className='font-semibold text-white'>Controls</h1>
-                        <p className='my-1 text-sm text-white/50'>Change the settings of the simulation.</p>
+                        <p className='my-1 text-sm text-white/50'>Change the settings of the simulation</p>
                     </div>
 
                     <div className='flex w-1/3 justify-end items-end'>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline">
-                                    +
+                                    <Plus />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className='bg-black text-white'>
@@ -187,7 +189,7 @@ export default function Home() {
                                     .map(strategy => (
                                         <DropdownMenuItem
                                             key={strategy.id}
-                                            onClick={() => handleAddStrategy(strategy.constructor.name)}
+                                            onClick={() => handleAddStrategy(strategy.title)}
                                         >
                                             {strategy.title}
                                         </DropdownMenuItem>
